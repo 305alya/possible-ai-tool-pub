@@ -228,7 +228,10 @@ def parse_market_odds(market: Dict) -> List[Dict]:
             if dec is None or dec <= 1:
                 continue
             selection = str(key).replace("_", " ").title()
-            rows.append({"market": market_name, "selection": f"{player_name} {side} {point}",
+            rows.append({
+    "market": market_name,
+    "selection": f"{player_name} {side} {point}",
+})
     return rows
 
 
