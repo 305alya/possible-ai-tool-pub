@@ -893,6 +893,24 @@ elif run:
                 final_rows.append(row)
             
             auto_slip = pd.DataFrame(final_rows)
+            # Fallback fill logic
+            if len(auto_slip) < slip_size:
+            
+                fallback_df = slip_df[
+                    ~slip_df["selection"].isin(auto_slip["selection"])
+                ].copy()
+            
+                fallback_df = fallback_df.sort_values(
+                    ["fair_prob", "confidence_score"],
+                    ascending=False
+                )
+            
+                needed = slip_size - len(auto_slip)
+            
+                auto_slip = pd.concat([
+                    auto_slip,
+                    fallback_df.head(needed)
+                ])
             # Safety check: same-game only
             if auto_slip["event_name"].nunique() > 1:
                 st.error("This slip includes legs from multiple games. Do not use it as a correlated same-game slip.")
