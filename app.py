@@ -619,10 +619,8 @@ elif run:
 
             if "player" in a and "totals" in c:
                 return "Strong"
-
-           
-
-    return "Weak"
+                return "Weak"
+                
     with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
