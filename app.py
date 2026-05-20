@@ -586,7 +586,28 @@ elif run:
             sorted(df["event_name"].dropna().unique())
         )
 
-        game_df = df[df["event_name"] == event_choice].copy()
+        game_df["correlation_reason"] = game_df["market"].apply(
+            lambda m: simple_correlation_reason(anchor_market, str(m))
+        )
+
+        suggestions = game_df[game_df["correlation_reason"] != ""].copy()
+
+        st.dataframe(
+            suggestions[
+                [
+                    "event_name",
+                    "market",
+                    "selection",
+                    "point",
+                    "american_odds",
+                    "ev_percent",
+                    "confidence_score",
+                    "correlation_reason"
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True
+        )
 
         anchor_choice = st.selectbox(
             "Choose your first leg",
