@@ -851,9 +851,11 @@ elif run:
             )
             if len(auto_slip) < slip_size:
                 st.info(f"Removed duplicate totals. Showing {len(auto_slip)} unique legs instead of {slip_size}.")
+                
             if build_mode == "Strict":
 
                 # Remove duplicate totals
+                
             seen_totals = set()
             filtered_rows = []
             
