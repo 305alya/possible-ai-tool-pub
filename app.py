@@ -659,7 +659,16 @@ elif run:
             slip_df["correlation_score"] = slip_df["market"].apply(
                 lambda m: correlation_score(anchor_market, m)
             )
-
+            slip_goal = st.selectbox(
+                "Slip goal",
+                [
+                    "Highest chance to win",
+                    "Best value / EV",
+                    "Most correlated"
+                ],
+                key="slip_goal_selector"
+            )
+            
             slip_df = slip_df[
                 (slip_df["selection"].astype(str) != anchor_choice) &
                 (slip_df["correlation_score"] != "")
