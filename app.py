@@ -620,21 +620,7 @@ elif run:
             if "player" in a and "totals" in c:
                 return "Strong"
 
-            def correlation_strength(anchor_market, candidate_market):
-    a = anchor_market.lower()
-    c = candidate_market.lower()
-
-    if "player" in a and "totals" in c:
-        return "Strong"
-
-    if "totals" in a and "player" in c:
-        return "Strong"
-
-    if "player" in a and "ml" in c:
-        return "Medium"
-
-    if "ml" in a and "player" in c:
-        return "Medium"
+           
 
     return "Weak"
         with tabs[3]:
