@@ -206,7 +206,7 @@ def mk_selection_key(selection: str, point: Optional[float]) -> str:
     return f"{selection}|{'' if point is None else point}"
 
 
-def parse_market_odds(market: Dict) -> List[Dict]:
+def parse_market_odds(market: Dict, home_team: str, away_team: str) -> List[Dict]:
     rows = []
     market_name = market.get("key") or market.get("name", "Unknown")
 
@@ -243,12 +243,19 @@ def parse_market_odds(market: Dict) -> List[Dict]:
                 continue
 
             side = str(key).replace("_", " ").title()
+            
+            if side.lower() == "home":
+                team_side = home_team
+            elif side.lower() == "away":
+                team_side = away_team
+            else:
+                team_side = side
 
             if market_name.lower() in ["h2h", "ml"]:
-                selection_text = f"{side} ML"
+                selection_text = f"{team_side} ML"
             
             elif market_name.lower() in ["spreads", "spread"]:
-                selection_text = f"{side} Spread {point}"
+                selection_text = f"{team_side} Spread {point}"
             
             elif "totals" in market_name.lower():
                 selection_text = f"{side} Total {point}"
@@ -291,7 +298,7 @@ def odds_response_to_rows(odds_data: Dict, sport: str, target_book: str, sharp_b
             # Temporarily do not filter markets until we confirm the API market names
 # if market_filter and market_name not in market_filter:
 #     continue
-            for parsed in parse_market_odds(market):
+            for parsed in parse_market_odds(market, home, away):
                 american = decimal_to_american(parsed["decimal_odds"])
                 if american is None:
                     continue
