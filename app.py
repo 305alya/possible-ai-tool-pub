@@ -552,25 +552,25 @@ elif run:
                     "serious_plus_ev_plays.csv",
                     "text/csv"
                 )
-           with tabs[2]:
-                st.subheader("Correlation Builder")
-            
-                if df.empty:
-                    st.info("Run a scan first.")
-                else:
-                    event_choice = st.selectbox(
-                        "Choose game",
-                        sorted(df["event_name"].dropna().unique())
-                    )
-            
-                    game_df = df[df["event_name"] == event_choice].copy()
-            
-                    anchor_choice = st.selectbox(
-                        "Choose your first leg",
-                        game_df["selection"].astype(str) + " - " + game_df["market"].astype(str)
-                    )
-            
-                    st.write("Suggested correlated legs will go here.")
+        with tabs[2]:
+            st.subheader("Correlation Builder")
+
+            if df.empty:
+                st.info("Run a scan first.")
+            else:
+                event_choice = st.selectbox(
+                    "Choose game",
+                    sorted(df["event_name"].dropna().unique())
+                )
+
+                game_df = df[df["event_name"] == event_choice].copy()
+
+                anchor_choice = st.selectbox(
+                    "Choose your first leg",
+                    game_df["selection"].astype(str) + " - " + game_df["market"].astype(str)
+                )
+
+                st.write("Suggested correlated legs will go here.")
         with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
