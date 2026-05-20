@@ -691,15 +691,7 @@ elif run:
                     ["correlation_score", "confidence_score", "fair_prob"],
                     ascending=False
                 )
-            slip_goal = st.selectbox(
-                "Slip goal",
-                [
-                    "Highest chance to win",
-                    "Best value / EV",
-                    "Most correlated"
-                ],
-                key="slip_goal_selector"
-            )
+            
             slip_size = st.selectbox(
                 "Slip size",
                 [2, 3, 4, 5, 6],
