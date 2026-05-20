@@ -628,15 +628,15 @@ elif run:
                 c = str(candidate_market).lower()
 
                 if "h2h" in anchor_market and "player" in c:
-                    return 2
+                    return "Medium"
                 if "ml" in anchor_market and "player" in c:
-                    return 2
+                    return "Medium"
                 if "player" in anchor_market and "totals" in c:
-                    return 3
+                    return "Strong"
                 if "totals" in anchor_market and "player" in c:
-                    return 3
+                    return "Strong"
                 if "h2h" in anchor_market and "spread" in c:
-                    return 1
+                    return "Weak"
 
                 return 0
 
