@@ -227,7 +227,8 @@ def parse_market_odds(market: Dict) -> List[Dict]:
             dec = normalize_decimal(val)
             if dec is None or dec <= 1:
                 continue
-            "selection": f"{player_name} {selection} {point} {market_name}".strip(),
+selection = str(key).replace("_", " ").title()
+
 player_name = (
     item.get("participant")
     or item.get("player")
@@ -239,7 +240,7 @@ player_name = (
 
 rows.append({
     "market": market_name,
-    "selection": f"{selection} {point} {market_name}",
+    "selection": f"{player_name} {selection} {point} {market_name}".strip(),
     "point": point,
     "decimal_odds": dec
 })
