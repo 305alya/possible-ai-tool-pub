@@ -571,7 +571,35 @@ elif run:
                     game_df["selection"].astype(str) + " - " + game_df["market"].astype(str)
                 )
 
-                st.write("Suggested correlated legs will go here.")
+                anchor_market = anchor_choice.split(" - ")[-1]
+
+def simple_correlation_reason(anchor_market, candidate_market):
+    a = anchor_market.lower()
+    c = candidate_market.lower()
+
+    if "props" in a and "ml" in c:
+        return "Player prop overs can correlate with that player's team winning."
+    if "props" in a and "totals" in c:
+        return "Player production can correlate with a higher-scoring game."
+    if "totals" in a and "props" in c:
+        return "A higher game total can support player overs."
+    if "ml" in a and "props" in c:
+        return "Team win scripts can support key player production."
+    return ""
+
+game_df["correlation_reason"] = game_df["market"].apply(
+    lambda m: simple_correlation_reason(anchor_market, str(m))
+)
+
+suggestions = game_df[game_df["correlation_reason"] != ""].copy()
+
+st.dataframe(
+    suggestions[
+        ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score", "correlation_reason"]
+    ],
+    use_container_width=True,
+    hide_index=True
+)
         with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
