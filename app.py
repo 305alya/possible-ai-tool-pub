@@ -253,7 +253,7 @@ def odds_response_to_rows(odds_data: Dict, sport: str, target_book: str, sharp_b
         if not isinstance(markets, list):
             continue
         for market in markets:
-            market_name = market.get("name", "Unknown")
+            market_name = market.get("key") or market.get("name", "Unknown")
             if market_filter and market_name not in market_filter:
                 continue
             for parsed in parse_market_odds(market):
