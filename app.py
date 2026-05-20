@@ -207,43 +207,50 @@ def mk_selection_key(selection: str, point: Optional[float]) -> str:
 
 
 def parse_market_odds(market: Dict) -> List[Dict]:
-    """Flatten Odds-API.io market odds. Handles common shapes like home/away, over/under with hdp, and list/dict odds."""
     rows = []
-    market_name = market.get("key", market.get("name", "Unknown"))
+    market_name = market.get("key") or market.get("name", "Unknown")
+
     odds_list = market.get("odds", [])
     if isinstance(odds_list, dict):
         odds_list = [odds_list]
+
     for item in odds_list:
         if not isinstance(item, dict):
             continue
+
         point = item.get("hdp") or item.get("point") or item.get("line")
+
         try:
             point = float(point) if point is not None else None
         except Exception:
             point = None
+
+        player_name = (
+            item.get("participant")
+            or item.get("player")
+            or item.get("name")
+            or item.get("description")
+            or item.get("label")
+            or ""
+        )
+
         for key, val in item.items():
-            if key in ["hdp", "point", "line", "updatedAt", "suspended"]:
+            if key in ["hdp", "point", "line", "updatedAt", "suspended", "participant", "player", "name", "description", "label"]:
                 continue
+
             dec = normalize_decimal(val)
             if dec is None or dec <= 1:
                 continue
-selection = str(key).replace("_", " ").title()
 
-player_name = (
-    item.get("participant")
-    or item.get("player")
-    or item.get("name")
-    or item.get("description")
-    or item.get("label")
-    or ""
-)
+            side = str(key).replace("_", " ").title()
 
-rows.append({
-    "market": market_name,
-    "selection": f"{player_name} {selection} {point} {market_name}".strip(),
-    "point": point,
-    "decimal_odds": dec
-})
+            rows.append({
+                "market": market_name,
+                "selection": f"{player_name} {side} {point} {market_name}".strip(),
+                "point": point,
+                "decimal_odds": dec
+            })
+
     return rows
 
 
