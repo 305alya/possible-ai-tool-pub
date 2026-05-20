@@ -764,28 +764,28 @@ elif run:
                 slip_df.head(slip_size - 1)
             ])
             if build_mode == "Strict":
-            seen_totals = set()
-            filtered_rows = []
+                seen_totals = set()
+                filtered_rows = []
         
-            for _, row in auto_slip.iterrows():
-                selection = str(row["selection"]).lower()
+                for _, row in auto_slip.iterrows():
+                    selection = str(row["selection"]).lower()
         
-                if "total" in selection:
-                    if "over" in selection:
-                        total_side = "over"
-                    elif "under" in selection:
-                        total_side = "under"
-                    else:
-                        total_side = "other"
+                    if "total" in selection:
+                        if "over" in selection:
+                            total_side = "over"
+                        elif "under" in selection:
+                            total_side = "under"
+                        else:
+                            total_side = "other"
+            
+                        if total_side in seen_totals:
+                            continue
+            
+                        seen_totals.add(total_side)
         
-                    if total_side in seen_totals:
-                        continue
-        
-                    seen_totals.add(total_side)
-        
-                filtered_rows.append(row)
-        
-            auto_slip = pd.DataFrame(filtered_rows)
+                    filtered_rows.append(row)
+            
+                auto_slip = pd.DataFrame(filtered_rows)
         
             ml_teams = set()
             final_rows = []
