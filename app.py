@@ -709,7 +709,7 @@ elif run:
             ])
             # Safety check: same-game only
             if auto_slip["event_name"].nunique() > 1:
-            st.error("This slip includes legs from multiple games. Do not use it as a correlated same-game slip.")
+                st.error("This slip includes legs from multiple games. Do not use it as a correlated same-game slip.")
             if "ML" in str(anchor_choice):
                 st.info("Game script: This slip is built around the selected team winning. Favor that team's key player overs and avoid unrelated games or conflicting unders.")
             if auto_slip["ev_percent"].mean() < 0:
