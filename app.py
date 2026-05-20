@@ -554,52 +554,64 @@ elif run:
                     "text/csv"
                 )
         with tabs[2]:
-            st.subheader("Correlation Builder")
+    st.subheader("Correlation Builder")
 
-            if df.empty:
-                st.info("Run a scan first.")
-            else:
-                event_choice = st.selectbox(
-                    "Choose game",
-                    sorted(df["event_name"].dropna().unique())
-                )
+    if df.empty:
+        st.info("Run a scan first.")
+    else:
+        event_choice = st.selectbox(
+            "Choose game",
+            sorted(df["event_name"].dropna().unique())
+        )
 
-                game_df = df[df["event_name"] == event_choice].copy()
+        game_df = df[df["event_name"] == event_choice].copy()
 
-                anchor_choice = st.selectbox(
-                    "Choose your first leg",
-                    game_df["selection"].astype(str) + " - " + game_df["market"].astype(str)
-                )
+        anchor_choice = st.selectbox(
+            "Choose your first leg",
+            game_df["selection"].astype(str) + " - " + game_df["market"].astype(str)
+        )
 
-                anchor_market = anchor_choice.split(" - ")[-1]
+        anchor_market = anchor_choice.split(" - ")[-1]
 
-def simple_correlation_reason(anchor_market, candidate_market):
-    a = anchor_market.lower()
-    c = candidate_market.lower()
+        def simple_correlation_reason(anchor_market, candidate_market):
+            a = anchor_market.lower()
+            c = candidate_market.lower()
 
-    if "props" in a and "ml" in c:
-        return "Player prop overs can correlate with that player's team winning."
-    if "props" in a and "totals" in c:
-        return "Player production can correlate with a higher-scoring game."
-    if "totals" in a and "props" in c:
-        return "A higher game total can support player overs."
-    if "ml" in a and "props" in c:
-        return "Team win scripts can support key player production."
-    return ""
+            if "props" in a and "ml" in c:
+                return "Player prop overs can correlate with team wins."
+            if "props" in a and "totals" in c:
+                return "Player production can correlate with high-scoring games."
+            if "totals" in a and "props" in c:
+                return "Higher totals can support player overs."
+            if "ml" in a and "props" in c:
+                return "Team wins can support star player production."
 
-game_df["correlation_reason"] = game_df["market"].apply(
-    lambda m: simple_correlation_reason(anchor_market, str(m))
-)
+            return ""
 
-suggestions = game_df[game_df["correlation_reason"] != ""].copy()
+        game_df["correlation_reason"] = game_df["market"].apply(
+            lambda m: simple_correlation_reason(anchor_market, str(m))
+        )
 
-st.dataframe(
-    suggestions[
-        ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score", "correlation_reason"]
-    ],
-    use_container_width=True,
-    hide_index=True
-)
+        suggestions = game_df[
+            game_df["correlation_reason"] != ""
+        ].copy()
+
+        st.dataframe(
+            suggestions[
+                [
+                    "event_name",
+                    "market",
+                    "selection",
+                    "point",
+                    "american_odds",
+                    "ev_percent",
+                    "confidence_score",
+                    "correlation_reason"
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True
+        )
         with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
