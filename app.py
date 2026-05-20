@@ -244,9 +244,21 @@ def parse_market_odds(market: Dict) -> List[Dict]:
 
             side = str(key).replace("_", " ").title()
 
+            if market_name == "h2h":
+                selection_text = f"{side} ML"
+            
+            elif market_name == "spreads":
+                selection_text = f"{side} Spread {point}"
+            
+            elif "totals" in market_name:
+                selection_text = f"{side} Total {point}"
+            
+            else:
+                selection_text = f"{player_name} {side} {point} {market_name}".strip()
+            
             rows.append({
                 "market": market_name,
-                "selection": f"{player_name} {side} {point} {market_name}".strip(),
+                "selection": selection_text,
                 "point": point,
                 "decimal_odds": dec
             })
