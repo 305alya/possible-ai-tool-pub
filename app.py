@@ -618,31 +618,9 @@ elif run:
             c = candidate_market.lower()
 
             if "player" in a and "totals" in c:
+                return "Strong"
 
-        game_df["correlation_reason"] = game_df["market"].apply(
-            lambda m: simple_correlation_reason(anchor_market, str(m))
-        )
-
-        suggestions = game_df[
-            game_df["correlation_reason"] != ""
-        ].copy()
-
-        st.dataframe(
-            suggestions[
-                [
-                    "event_name",
-                    "market",
-                    "selection",
-                    "point",
-                    "american_odds",
-                    "ev_percent",
-                    "confidence_score",
-                    "correlation_reason"
-                ]
-            ],
-            use_container_width=True,
-            hide_index=True
-        )
+            if
         with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
