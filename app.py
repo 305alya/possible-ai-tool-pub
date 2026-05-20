@@ -795,6 +795,48 @@ elif run:
             }
             
             auto_slip["correlation_rank"] = auto_slip["correlation_score"].map(CORRELATION_RANK)
+
+            auto_slip = auto_slip.sort_values(
+                ["correlation_rank", "confidence_score", "fair_prob"],
+                ascending=False
+            )
+            def slip_health_grade(auto_slip):
+                grade_points = 100
+            
+                # Penalize negative average EV
+                if auto_slip["ev_percent"].mean() < 0:
+                    grade_points -= 15
+            
+                # Penalize low confidence
+                if auto_slip["confidence_score"].mean() < 15:
+                    grade_points -= 15
+            
+                # Penalize review legs
+                if "Review" in auto_slip["correlation_score"].astype(str).values:
+                    grade_points -= 15
+            
+                # Penalize weak legs
+                weak_count = (auto_slip["correlation_score"].astype(str) == "Weak").sum()
+                grade_points -= weak_count * 10
+            
+                # Penalize duplicate totals
+                total_count = auto_slip["selection"].astype(str).str.contains("Total", case=False).sum()
+                if total_count > 1:
+                    grade_points -= 10
+            
+                if grade_points >= 90:
+                    return "A"
+                elif grade_points >= 80:
+                    return "B"
+                elif grade_points >= 70:
+                    return "C"
+                elif grade_points >= 60:
+                    return "D"
+                else:
+                    return "F"
+            
+            grade = slip_health_grade(auto_slip)
+            st.metric("Slip Health Grade", grade)
             auto_slip = auto_slip.sort_values(
                 ["correlation_rank", "confidence_score", "fair_prob"],
                 ascending=False
