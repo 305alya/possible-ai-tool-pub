@@ -668,21 +668,7 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
-        def simple_correlation_reason(anchor_market, candidate_market):
-            a = anchor_market.lower()
-            c = candidate_market.lower()
-
-            if "player" in a and "totals" in c:
-                return "Player production can correlate with high-scoring games."
-
-            if "totals" in a and "player" in c:
-                return "Higher totals can support player overs."
-
-            if "player" in a and "ml" in c:
-                return "Player prop overs can correlate with team wins."
-
-            if "ml" in a and "player" in c:
-                return "Team wins can support star player production."
+        
 
             return ""
 
