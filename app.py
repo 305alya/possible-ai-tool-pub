@@ -586,7 +586,14 @@ elif run:
             sorted(df["event_name"].dropna().unique())
         )
 
-        game_df["correlation_reason"] = game_df["market"].apply(
+        
+
+        anchor_choice = st.selectbox(
+            "Choose your first leg",
+            game_df["selection"].astype(str)
+        )
+
+        anchor_market = anchor_choice.lower()game_df["correlation_reason"] = game_df["market"].apply(
             lambda m: simple_correlation_reason(anchor_market, str(m))
         )
 
@@ -608,13 +615,6 @@ elif run:
             use_container_width=True,
             hide_index=True
         )
-
-        anchor_choice = st.selectbox(
-            "Choose your first leg",
-            game_df["selection"].astype(str)
-        )
-
-        anchor_market = anchor_choice.lower()
 
         def simple_correlation_reason(anchor_market, candidate_market):
             a = anchor_market.lower()
