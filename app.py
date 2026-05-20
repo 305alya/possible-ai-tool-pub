@@ -662,12 +662,35 @@ elif run:
 
             slip_df = slip_df[
                 (slip_df["selection"].astype(str) != anchor_choice) &
-                (slip_df["correlation_score"] != "")
-            ].sort_values(
-                ["correlation_score", "confidence_score", "ev_percent"],
-                ascending=False
+                (slip_df["correlation_score"] > 0)
+            ]
+            
+            if slip_goal == "Highest chance to win":
+                slip_df = slip_df.sort_values(
+                    ["confidence_score", "correlation_score", "fair_prob"],
+                    ascending=False
+                )
+            
+            elif slip_goal == "Best value / EV":
+                slip_df = slip_df.sort_values(
+                    ["ev_percent", "confidence_score", "correlation_score"],
+                    ascending=False
+                )
+            
+            else:
+                slip_df = slip_df.sort_values(
+                    ["correlation_score", "confidence_score", "fair_prob"],
+                    ascending=False
+                )
+            slip_goal = st.selectbox(
+                "Slip goal",
+                [
+                    "Highest chance to win",
+                    "Best value / EV",
+                    "Most correlated"
+                ],
+                key="slip_goal_selector"
             )
-
             slip_size = st.selectbox(
                 "Slip size",
                 [2, 3, 4, 5, 6],
