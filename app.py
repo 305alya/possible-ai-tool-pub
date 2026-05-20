@@ -585,8 +585,7 @@ elif run:
             "Choose game",
             sorted(df["event_name"].dropna().unique())
         )
-
-        
+        game_df = df[df["event_name"] == event_choice].copy()
 
         anchor_choice = st.selectbox(
             "Choose your first leg",
