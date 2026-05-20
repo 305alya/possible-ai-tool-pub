@@ -593,7 +593,8 @@ elif run:
             game_df["selection"].astype(str)
         )
 
-        anchor_market = anchor_choice.lower()game_df["correlation_reason"] = game_df["market"].apply(
+        anchor_market = anchor_choice.lower()
+        game_df["correlation_reason"] = game_df["market"].apply(
             lambda m: simple_correlation_reason(anchor_market, str(m))
         )
 
