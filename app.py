@@ -233,14 +233,6 @@ def parse_market_odds(market: Dict, home_team: str, away_team: str) -> List[Dict
             or item.get("label")
             or ""
         )
-        player_name = (
-            item.get("participant")
-            or item.get("player")
-            or item.get("name")
-            or item.get("description")
-            or item.get("label")
-            or ""
-        )
         
         player_team = (
             item.get("team")
@@ -771,12 +763,13 @@ elif run:
                 anchor_row.to_frame().T,
                 slip_df.head(slip_size - 1)
             ])
+            if build_mode == "Strict":
             seen_totals = set()
             filtered_rows = []
-            
+        
             for _, row in auto_slip.iterrows():
                 selection = str(row["selection"]).lower()
-            
+        
                 if "total" in selection:
                     if "over" in selection:
                         total_side = "over"
@@ -784,145 +777,53 @@ elif run:
                         total_side = "under"
                     else:
                         total_side = "other"
-            
+        
                     if total_side in seen_totals:
                         continue
-            
+        
                     seen_totals.add(total_side)
-            
+        
                 filtered_rows.append(row)
-            
+        
             auto_slip = pd.DataFrame(filtered_rows)
-            CORRELATION_RANK = {
-                "Anchor": 4,
-                "Strong": 3,
-                "Medium": 2,
-                "Weak": 1,
-                "Review": 0,
-                "": -1
-            }
-            
-            auto_slip["correlation_rank"] = auto_slip["correlation_score"].map(CORRELATION_RANK)
-
-            auto_slip = auto_slip.sort_values(
-                ["correlation_rank", "confidence_score", "fair_prob"],
-                ascending=False
-            )
-            def slip_health_grade(auto_slip):
-                grade_points = 100
-            
-                # Penalize negative average EV
-                if auto_slip["ev_percent"].mean() < 0:
-                    grade_points -= 15
-            
-                # Penalize low confidence
-                if auto_slip["confidence_score"].mean() < 15:
-                    grade_points -= 15
-            
-                # Penalize review legs
-                if "Review" in auto_slip["correlation_score"].astype(str).values:
-                    grade_points -= 15
-            
-                # Penalize weak legs
-                weak_count = (auto_slip["correlation_score"].astype(str) == "Weak").sum()
-                grade_points -= weak_count * 10
-            
-                # Penalize duplicate totals
-                total_count = auto_slip["selection"].astype(str).str.contains("Total", case=False).sum()
-                if total_count > 1:
-                    grade_points -= 10
-            
-                if grade_points >= 90:
-                    return "A"
-                elif grade_points >= 80:
-                    return "B"
-                elif grade_points >= 70:
-                    return "C"
-                elif grade_points >= 60:
-                    return "D"
-                else:
-                    return "F"
-            
-            grade = slip_health_grade(auto_slip)
-            st.metric("Slip Health Grade", grade)
-            auto_slip = auto_slip.sort_values(
-                ["correlation_rank", "confidence_score", "fair_prob"],
-                ascending=False
-            )
-            if len(auto_slip) < slip_size:
-                st.info(f"Removed duplicate totals. Showing {len(auto_slip)} unique legs instead of {slip_size}.")
-                
-            if build_mode == "Strict":
-
-                # Remove duplicate totals
-                seen_totals = set()
-                filtered_rows = []
-            
-                for _, row in auto_slip.iterrows():
-                    market = str(row["market"]).lower()
-                    selection = str(row["selection"])
-            
-                if "total" in selection.lower():
-            
-                    # Extract Over/Under
-                    if "over" in selection.lower():
-                        total_side = "over"
-                    elif "under" in selection.lower():
-                        total_side = "under"
-                    else:
-                        total_side = "other"
-            
-                    # Only allow one Over and one Under total
-                    if total_side in seen_totals:
-                        continue
-            
-                    seen_totals.add(total_side)
-            
-                filtered_rows.append(row)
-            
-            auto_slip = pd.DataFrame(filtered_rows)
-            
-            if build_mode == "Strict":
-
-                # Remove conflicting moneylines
-                ml_teams = set()
-                final_rows = []
-                
-                for _, row in auto_slip.iterrows():
-                    market = str(row["market"]).lower()
-                    selection = str(row["selection"])
-                
+        
+            ml_teams = set()
+            final_rows = []
+        
+            for _, row in auto_slip.iterrows():
+                market = str(row["market"]).lower()
+                selection = str(row["selection"])
+        
                 if "ml" in market:
-                    if selection in ml_teams:
-                        continue
-            
-                    # If another ML already exists, skip opposite side
                     if len(ml_teams) >= 1:
                         continue
-            
                     ml_teams.add(selection)
-            
+        
                 final_rows.append(row)
-            
+        
             auto_slip = pd.DataFrame(final_rows)
-            # Fallback fill logic
-            if len(auto_slip) < slip_size:
-            
-                fallback_df = slip_df[
-                    ~slip_df["selection"].isin(auto_slip["selection"])
-                ].copy()
-            
-                fallback_df = fallback_df.sort_values(
-                    ["fair_prob", "confidence_score"],
-                    ascending=False
-                )
-            
-                needed = slip_size - len(auto_slip)
-            
-                auto_slip = pd.concat([
-                    auto_slip,
-                    fallback_df.head(needed)
-                ])
+        
+        if len(auto_slip) < slip_size:
+            fallback_df = slip_df[
+                ~slip_df["selection"].isin(auto_slip["selection"])
+            ].copy()
+        
+            if auto_slip["market"].astype(str).str.contains("ML", case=False).any():
+                fallback_df = fallback_df[
+                    ~fallback_df["market"].astype(str).str.contains("ML", case=False)
+                ]
+        
+            fallback_df = fallback_df.sort_values(
+                ["fair_prob", "confidence_score"],
+                ascending=False
+            )
+        
+            needed = slip_size - len(auto_slip)
+        
+            auto_slip = pd.concat([
+                auto_slip,
+                fallback_df.head(needed)
+            ])
             # Safety check: same-game only
             if auto_slip["event_name"].nunique() > 1:
                 st.error("This slip includes legs from multiple games. Do not use it as a correlated same-game slip.")
