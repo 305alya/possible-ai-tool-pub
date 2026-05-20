@@ -209,7 +209,7 @@ def mk_selection_key(selection: str, point: Optional[float]) -> str:
 def parse_market_odds(market: Dict) -> List[Dict]:
     """Flatten Odds-API.io market odds. Handles common shapes like home/away, over/under with hdp, and list/dict odds."""
     rows = []
-    market_name = market.get("name", "Unknown")
+    market_name = market.get("key", market.get("name", "Unknown"))
     odds_list = market.get("odds", [])
     if isinstance(odds_list, dict):
         odds_list = [odds_list]
