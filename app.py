@@ -647,7 +647,7 @@ elif run:
 
             slip_df = slip_df[
                 (slip_df["selection"].astype(str) != anchor_choice) &
-                (slip_df["correlation_score"] > 0)
+                (slip_df["correlation_score"] != "")
             ].sort_values(
                 ["correlation_score", "confidence_score", "ev_percent"],
                 ascending=False
