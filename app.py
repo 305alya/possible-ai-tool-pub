@@ -653,7 +653,7 @@ elif run:
                 if "h2h" in anchor_market and "spread" in c:
                     return "Weak"
 
-                return 0
+                return ""
 
             slip_df = game_df.copy()
             
