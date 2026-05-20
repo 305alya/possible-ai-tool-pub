@@ -704,7 +704,9 @@ elif run:
             
                 return ""
 
-            slip_df = game_df.copy()
+            slip_df = game_df[
+                game_df["market"].isin(selected_markets)
+            ].copy()
             
             # Keep only legs from the exact selected game
             slip_df = slip_df[slip_df["event_name"] == event_choice].copy()
