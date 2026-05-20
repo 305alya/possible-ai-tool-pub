@@ -795,6 +795,10 @@ elif run:
             }
             
             auto_slip["correlation_rank"] = auto_slip["correlation_score"].map(CORRELATION_RANK)
+            auto_slip = auto_slip.sort_values(
+                ["correlation_rank", "confidence_score", "fair_prob"],
+                ascending=False
+            )
             if len(auto_slip) < slip_size:
                 st.info(f"Removed duplicate totals. Showing {len(auto_slip)} unique legs instead of {slip_size}.")
             # Remove near-duplicate totals
