@@ -215,6 +215,9 @@ def parse_market_odds(market: Dict, home_team: str, away_team: str) -> List[Dict
         odds_list = [odds_list]
 
     for item in odds_list:
+        if market_name.lower() == "player props":
+            st.json(item)
+            st.stop()
         if not isinstance(item, dict):
             continue
 
