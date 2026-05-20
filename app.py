@@ -730,7 +730,13 @@ elif run:
                 ],
                 key="slip_goal_selector"
             )
-            
+
+            build_mode = st.selectbox(
+                "Build mode",
+                ["Flexible", "Strict"],
+                index=0,
+                key="build_mode_selector"
+            )
             slip_df = slip_df[
                 (slip_df["selection"].astype(str) != anchor_choice) &
                 (slip_df["correlation_score"] != "")
@@ -845,7 +851,9 @@ elif run:
             )
             if len(auto_slip) < slip_size:
                 st.info(f"Removed duplicate totals. Showing {len(auto_slip)} unique legs instead of {slip_size}.")
-            # Remove near-duplicate totals
+            if build_mode == "Strict":
+
+                # Remove duplicate totals
             seen_totals = set()
             filtered_rows = []
             
@@ -872,7 +880,10 @@ elif run:
                 filtered_rows.append(row)
             
             auto_slip = pd.DataFrame(filtered_rows)
-            # Remove conflicting moneylines
+            
+            if build_mode == "Strict":
+
+                # Remove conflicting moneylines
             ml_teams = set()
             final_rows = []
             
