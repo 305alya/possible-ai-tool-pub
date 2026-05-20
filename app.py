@@ -337,6 +337,8 @@ def odds_response_to_rows(odds_data: Dict, sport: str, target_book: str, sharp_b
                     "decimal_odds": parsed["decimal_odds"],
                     "american_odds": american,
                     "selection_key": skey,
+                    "player_name": parsed.get("player_name", ""),
+                    "player_team": parsed.get("player_team", ""),
                 }
                 flat_offers.append(offer)
                 offers_by_market_selection.setdefault((market_name, skey), []).append(offer)
@@ -388,6 +390,10 @@ def odds_response_to_rows(odds_data: Dict, sport: str, target_book: str, sharp_b
                 "league": league_name,
                 "event_id": event_id,
                 "event_name": event_name,
+                "home_team": home,
+                "away_team": away,
+                "player_name": offer.get("player_name", ""),
+                "player_team": offer.get("player_team", ""),
                 "market": offer["market"],
                 "selection": offer["selection"],
                 "point": offer["point"],
@@ -665,20 +671,37 @@ elif run:
             anchor_row = game_df[game_df["selection"].astype(str) == anchor_choice].iloc[0]
             anchor_market = str(anchor_row["market"]).lower()
 
-            def correlation_score(anchor_market, candidate_market):
-                c = str(candidate_market).lower()
-
-                if "h2h" in anchor_market and "player" in c:
-                    return "Medium"
-                if "ml" in anchor_market and "player" in c:
-                    return "Medium"
-                if "player" in anchor_market and "totals" in c:
-                    return "Strong"
-                if "totals" in anchor_market and "player" in c:
-                    return "Strong"
-                if "h2h" in anchor_market and "spread" in c:
-                    return "Weak"
-
+            def correlation_score(candidate_market, candidate_selection, player_team, home_team, away_team):
+                anchor_text = str(anchor_choice)
+                c_market = str(candidate_market).lower()
+                c_selection = str(candidate_selection).lower()
+                p_team = str(player_team)
+            
+                if not p_team:
+                    return "Review"
+            
+                if p_team not in [home_team, away_team]:
+                    return ""
+            
+                if home_team in anchor_text:
+                    anchor_team = home_team
+                    opponent_team = away_team
+                elif away_team in anchor_text:
+                    anchor_team = away_team
+                    opponent_team = home_team
+                else:
+                    return "Review"
+            
+                if "player" in c_market:
+                    if p_team == anchor_team and "over" in c_selection:
+                        return "Strong"
+                    if p_team == opponent_team and "under" in c_selection:
+                        return "Medium"
+                    if p_team == opponent_team and "over" in c_selection:
+                        return "Weak"
+                    if p_team == anchor_team and "under" in c_selection:
+                        return "Weak"
+            
                 return ""
 
             slip_df = game_df.copy()
@@ -686,8 +709,15 @@ elif run:
             # Keep only legs from the exact selected game
             slip_df = slip_df[slip_df["event_name"] == event_choice].copy()
             
-            slip_df["correlation_score"] = slip_df["market"].apply(
-                lambda m: correlation_score(anchor_market, m)
+            slip_df["correlation_score"] = slip_df.apply(
+                lambda r: correlation_score(
+                    r["market"],
+                    r["selection"],
+                    r.get("player_team", ""),
+                    r.get("home_team", ""),
+                    r.get("away_team", "")
+                ),
+                axis=1
             )
             slip_goal = st.selectbox(
                 "Slip goal",
