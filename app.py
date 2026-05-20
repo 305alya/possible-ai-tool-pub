@@ -233,7 +233,31 @@ def parse_market_odds(market: Dict, home_team: str, away_team: str) -> List[Dict
             or item.get("label")
             or ""
         )
-
+        player_name = (
+            item.get("participant")
+            or item.get("player")
+            or item.get("name")
+            or item.get("description")
+            or item.get("label")
+            or ""
+        )
+        
+        player_team = (
+            item.get("team")
+            or item.get("teamName")
+            or item.get("participantTeam")
+            or item.get("participant_team")
+            or item.get("team_name")
+            or ""
+        )
+        
+        if isinstance(player_team, dict):
+            player_team = (
+                player_team.get("name")
+                or player_team.get("displayName")
+                or player_team.get("title")
+                or ""
+            )
         for key, val in item.items():
             if key in ["hdp", "point", "line", "updatedAt", "suspended", "participant", "player", "name", "description", "label"]:
                 continue
@@ -267,7 +291,9 @@ def parse_market_odds(market: Dict, home_team: str, away_team: str) -> List[Dict
                 "market": market_name,
                 "selection": selection_text,
                 "point": point,
-                "decimal_odds": dec
+                "decimal_odds": dec,
+                "player_name": player_name,
+                "player_team": player_team,
             })
 
     return rows
