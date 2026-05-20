@@ -634,7 +634,7 @@ elif run:
                 else:
                     st.info("No provider value bets returned.")
 
-        with tabs[4]:
+    with tabs[4]:
             st.caption("Uses Odds-API.io's /arbitrage-bets endpoint when available for your plan/bookmakers.")
             if st.button("Fetch provider arbitrage"):
                 arbs, err, usage = fetch_arbitrage(api_key, bookmakers)
@@ -645,7 +645,7 @@ elif run:
                 else:
                     st.info("No provider arbitrage returned.")
 
-        with tabs[5]:
+    with tabs[5]:
             hist = load_history()
             if hist.empty:
                 st.info("No history saved yet. Run scans with 'Save odds snapshots' enabled.")
@@ -669,7 +669,7 @@ elif run:
                 fig = px.line(h, x="ts_dt", y="american_odds", color="sportsbook", title="Line Movement")
                 st.plotly_chart(fig, use_container_width=True)
 
-        with tabs[6]:
+    with tabs[6]:
             st.dataframe(style_ev_table(df[display_cols]), use_container_width=True, hide_index=True)
             st.download_button("Download raw odds CSV", df.to_csv(index=False).encode("utf-8"), "raw_odds.csv", "text/csv")
 else:
