@@ -244,7 +244,7 @@ rows.append({
     "point": point,
     "decimal_odds": dec
 })
-    return rows
+return rows
 
 
 def odds_response_to_rows(odds_data: Dict, sport: str, target_book: str, sharp_books: List[str], bankroll: float, kelly_mult: float, market_filter: List[str]) -> pd.DataFrame:
