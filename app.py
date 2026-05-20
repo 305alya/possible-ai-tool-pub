@@ -623,7 +623,7 @@ elif run:
            
 
     return "Weak"
-        with tabs[3]:
+    with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
                 vals, err, usage = fetch_value_bets(api_key, target_book, sports[0] if sports else None)
