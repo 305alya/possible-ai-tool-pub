@@ -576,7 +576,7 @@ elif run:
                     "text/csv"
                 )
         with tabs[2]:
-    st.subheader("Correlation Builder")
+            st.subheader("Correlation Builder")
 
     if df.empty:
         st.info("Run a scan first.")
