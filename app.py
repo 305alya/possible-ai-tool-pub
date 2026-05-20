@@ -579,7 +579,7 @@ elif run:
 
         with tabs[1]:
             st.subheader("High Probability Bets")
-            
+
             high_prob = df[df["fair_prob"] >= 0.80].copy()
             high_prob = high_prob.sort_values(by="fair_prob", ascending=False).head(25)
 
@@ -587,89 +587,81 @@ elif run:
                 st.info("No high probability bets found.")
             else:
                 st.dataframe(style_ev_table(high_prob[display_cols]), use_container_width=True, hide_index=True)
-                
-                st.download_button(
-                    "Download serious +EV CSV",
-                    serious.to_csv(index=False).encode("utf-8"),
-                    "serious_plus_ev_plays.csv",
-                    "text/csv"
-                )
+
         with tabs[2]:
-                st.subheader("Correlation Builder")
-            
-                event_choice = st.selectbox(
-                    "Choose game",
-                    sorted(df["event_name"].dropna().unique())
-                )
-            
-                game_df = df[df["event_name"] == event_choice].copy()
-            
-                anchor_choice = st.selectbox(
-                    "Choose your first leg",
-                    game_df["selection"].astype(str)
-                )
-            
-                st.write("Selected leg:", anchor_choice)
-            
-                st.dataframe(
-                    game_df[
-                        ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score"]
-                    ],
-                    use_container_width=True,
-                    hide_index=True
-                )
+            st.subheader("Correlation Builder")
 
-                st.subheader("Auto Correlation Slip")
+            event_choice = st.selectbox(
+                "Choose game",
+                sorted(df["event_name"].dropna().unique())
+            )
 
-anchor_row = game_df[game_df["selection"].astype(str) == anchor_choice].iloc[0]
-anchor_market = str(anchor_row["market"]).lower()
+            game_df = df[df["event_name"] == event_choice].copy()
 
-def correlation_score(anchor_market, candidate_market):
-    c = str(candidate_market).lower()
+            anchor_choice = st.selectbox(
+                "Choose your first leg",
+                game_df["selection"].astype(str)
+            )
 
-    if "ml" in anchor_market and "player" in c:
-        return 2
+            st.write("Selected leg:", anchor_choice)
 
-    if "player" in anchor_market and "totals" in c:
-        return 3
+            st.dataframe(
+                game_df[
+                    ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score"]
+                ],
+                use_container_width=True,
+                hide_index=True
+            )
 
-    if "totals" in anchor_market and "player" in c:
-        return 3
+            st.subheader("Auto Correlation Slip")
 
-    if "ml" in anchor_market and "spread" in c:
-        return 1
+            anchor_row = game_df[game_df["selection"].astype(str) == anchor_choice].iloc[0]
+            anchor_market = str(anchor_row["market"]).lower()
 
-    return 0
+            def correlation_score(anchor_market, candidate_market):
+                c = str(candidate_market).lower()
 
-slip_df = game_df.copy()
-slip_df["correlation_score"] = slip_df["market"].apply(
-    lambda m: correlation_score(anchor_market, m)
-)
+                if "h2h" in anchor_market and "player" in c:
+                    return 2
+                if "ml" in anchor_market and "player" in c:
+                    return 2
+                if "player" in anchor_market and "totals" in c:
+                    return 3
+                if "totals" in anchor_market and "player" in c:
+                    return 3
+                if "h2h" in anchor_market and "spread" in c:
+                    return 1
 
-slip_df = slip_df[
-    (slip_df["selection"].astype(str) != anchor_choice) &
-    (slip_df["correlation_score"] > 0)
-].sort_values(
-    ["correlation_score", "confidence_score", "ev_percent"],
-    ascending=False
-)
+                return 0
 
-slip_size = st.selectbox("Slip size", [2, 3, 4, 5, 6], index=1)
+            slip_df = game_df.copy()
+            slip_df["correlation_score"] = slip_df["market"].apply(
+                lambda m: correlation_score(anchor_market, m)
+            )
 
-auto_slip = pd.concat([
-    anchor_row.to_frame().T,
-    slip_df.head(slip_size - 1)
-])
+            slip_df = slip_df[
+                (slip_df["selection"].astype(str) != anchor_choice) &
+                (slip_df["correlation_score"] > 0)
+            ].sort_values(
+                ["correlation_score", "confidence_score", "ev_percent"],
+                ascending=False
+            )
 
-st.dataframe(
-    auto_slip[
-        ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score", "correlation_score"]
-    ],
-    use_container_width=True,
-    hide_index=True
-)
+            slip_size = st.selectbox("Slip size", [2, 3, 4, 5, 6], index=1)
 
-                
+            auto_slip = pd.concat([
+                anchor_row.to_frame().T,
+                slip_df.head(slip_size - 1)
+            ])
+
+            st.dataframe(
+                auto_slip[
+                    ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score", "correlation_score"]
+                ],
+                use_container_width=True,
+                hide_index=True
+            )
+
         with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
             if st.button("Fetch provider value bets"):
@@ -681,7 +673,7 @@ st.dataframe(
                 else:
                     st.info("No provider value bets returned.")
 
-    with tabs[4]:
+        with tabs[4]:
             st.caption("Uses Odds-API.io's /arbitrage-bets endpoint when available for your plan/bookmakers.")
             if st.button("Fetch provider arbitrage"):
                 arbs, err, usage = fetch_arbitrage(api_key, bookmakers)
@@ -692,7 +684,7 @@ st.dataframe(
                 else:
                     st.info("No provider arbitrage returned.")
 
-    with tabs[5]:
+        with tabs[5]:
             hist = load_history()
             if hist.empty:
                 st.info("No history saved yet. Run scans with 'Save odds snapshots' enabled.")
@@ -716,9 +708,14 @@ st.dataframe(
                 fig = px.line(h, x="ts_dt", y="american_odds", color="sportsbook", title="Line Movement")
                 st.plotly_chart(fig, use_container_width=True)
 
-    with tabs[6]:
+        with tabs[6]:
             st.dataframe(style_ev_table(df[display_cols]), use_container_width=True, hide_index=True)
-            st.download_button("Download raw odds CSV", df.to_csv(index=False).encode("utf-8"), "raw_odds.csv", "text/csv")
+            st.download_button(
+                "Download raw odds CSV",
+                df.to_csv(index=False).encode("utf-8"),
+                "raw_odds.csv",
+                "text/csv"
+            )
 else:
     st.write("Choose settings and run a scan. For NBA: Sport = basketball, League keyword = nba, Target = FanDuel.")
     st.info("This version is for keys from odds-api.io/dashboard/settings, not The-Odds-API.com keys.")
