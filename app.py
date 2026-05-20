@@ -244,13 +244,13 @@ def parse_market_odds(market: Dict) -> List[Dict]:
 
             side = str(key).replace("_", " ").title()
 
-            if market_name == "h2h":
+            if market_name.lower() in ["h2h", "ml"]:
                 selection_text = f"{side} ML"
             
-            elif market_name == "spreads":
+            elif market_name.lower() in ["spreads", "spread"]:
                 selection_text = f"{side} Spread {point}"
             
-            elif "totals" in market_name:
+            elif "totals" in market_name.lower():
                 selection_text = f"{side} Total {point}"
             
             else:
