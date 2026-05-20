@@ -885,13 +885,13 @@ elif run:
             if build_mode == "Strict":
 
                 # Remove conflicting moneylines
-            ml_teams = set()
-            final_rows = []
-            
-            for _, row in auto_slip.iterrows():
-                market = str(row["market"]).lower()
-                selection = str(row["selection"])
-            
+                ml_teams = set()
+                final_rows = []
+                
+                for _, row in auto_slip.iterrows():
+                    market = str(row["market"]).lower()
+                    selection = str(row["selection"])
+                
                 if "ml" in market:
                     if selection in ml_teams:
                         continue
