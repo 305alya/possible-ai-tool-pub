@@ -230,7 +230,9 @@ def parse_market_odds(market: Dict) -> List[Dict]:
             selection = str(key).replace("_", " ").title()
             rows.append({
     "market": market_name,
-    "selection": f"{player_name} {side} {point}",
+    "selection": f"{selection} {point}",
+    "point": point,
+    "decimal_odds": dec
 })
     return rows
 
