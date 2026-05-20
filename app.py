@@ -576,7 +576,7 @@ elif run:
                     "text/csv"
                 )
         with tabs[2]:
-            st.subheader("Correlation Builder")
+    st.subheader("Correlation Builder")
 
     if df.empty:
         st.info("Run a scan first.")
@@ -590,25 +590,34 @@ elif run:
 
         anchor_choice = st.selectbox(
             "Choose your first leg",
-            game_df["selection"].astype(str) + " - " + game_df["market"].astype(str)
+            game_df["selection"].astype(str)
         )
 
-        anchor_market = anchor_choice.split(" - ")[-1]
+        anchor_market = anchor_choice.lower()
 
         def simple_correlation_reason(anchor_market, candidate_market):
             a = anchor_market.lower()
             c = candidate_market.lower()
 
-            if "props" in a and "ml" in c:
-                return "Player prop overs can correlate with team wins."
-            if "props" in a and "totals" in c:
+            if "player" in a and "totals" in c:
                 return "Player production can correlate with high-scoring games."
-            if "totals" in a and "props" in c:
+
+            if "totals" in a and "player" in c:
                 return "Higher totals can support player overs."
-            if "ml" in a and "props" in c:
+
+            if "player" in a and "ml" in c:
+                return "Player prop overs can correlate with team wins."
+
+            if "ml" in a and "player" in c:
                 return "Team wins can support star player production."
 
             return ""
+
+        def correlation_strength(anchor_market, candidate_market):
+            a = anchor_market.lower()
+            c = candidate_market.lower()
+
+            if "player" in a and "totals" in c:
 
         game_df["correlation_reason"] = game_df["market"].apply(
             lambda m: simple_correlation_reason(anchor_market, str(m))
