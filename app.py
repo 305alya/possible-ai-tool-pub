@@ -568,7 +568,22 @@ elif run:
             save_snapshots(df)
 
         df = df.sort_values(["ev_percent", "confidence_score"], ascending=False)
+
+        def confidence_label(score):
+            if score >= 70:
+                return "Elite"
+            if score >= 50:
+                return "Strong"
+            if score >= 30:
+                return "Moderate"
+            if score >= 15:
+                return "Low"
+            return "Very Low"
+
+        df["confidence_label"] = df["confidence_score"].apply(confidence_label)
+
         serious = df[df["ev_percent"] >= min_ev]
+        
         serious = serious[serious["books_used"] >= min_books]
         if require_sharp:
             serious = serious[serious["sharp_available"] == True]
