@@ -670,7 +670,7 @@ st.dataframe(
 )
         
 
-        def correlation_strength(anchor_market, candidate_market):
+    def correlation_strength(anchor_market, candidate_market):
             a = anchor_market.lower()
             c = candidate_market.lower()
 
