@@ -647,7 +647,12 @@ elif run:
                 ascending=False
             )
 
-            slip_size = st.selectbox("Slip size", [2, 3, 4, 5, 6], index=1)
+            slip_size = st.selectbox(
+                "Slip size",
+                [2, 3, 4, 5, 6],
+                index=4,
+                key="slip_size_selector"
+            )
 
             auto_slip = pd.concat([
                 anchor_row.to_frame().T,
