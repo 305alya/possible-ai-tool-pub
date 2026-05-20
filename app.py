@@ -618,6 +618,56 @@ elif run:
                     use_container_width=True,
                     hide_index=True
                 )
+
+                st.subheader("Auto Correlation Slip")
+
+anchor_row = game_df[game_df["selection"].astype(str) == anchor_choice].iloc[0]
+anchor_market = str(anchor_row["market"]).lower()
+
+def correlation_score(anchor_market, candidate_market):
+    c = str(candidate_market).lower()
+
+    if "ml" in anchor_market and "player" in c:
+        return 2
+
+    if "player" in anchor_market and "totals" in c:
+        return 3
+
+    if "totals" in anchor_market and "player" in c:
+        return 3
+
+    if "ml" in anchor_market and "spread" in c:
+        return 1
+
+    return 0
+
+slip_df = game_df.copy()
+slip_df["correlation_score"] = slip_df["market"].apply(
+    lambda m: correlation_score(anchor_market, m)
+)
+
+slip_df = slip_df[
+    (slip_df["selection"].astype(str) != anchor_choice) &
+    (slip_df["correlation_score"] > 0)
+].sort_values(
+    ["correlation_score", "confidence_score", "ev_percent"],
+    ascending=False
+)
+
+slip_size = st.selectbox("Slip size", [2, 3, 4, 5, 6], index=1)
+
+auto_slip = pd.concat([
+    anchor_row.to_frame().T,
+    slip_df.head(slip_size - 1)
+])
+
+st.dataframe(
+    auto_slip[
+        ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score", "correlation_score"]
+    ],
+    use_container_width=True,
+    hide_index=True
+)
         def simple_correlation_reason(anchor_market, candidate_market):
             a = anchor_market.lower()
             c = candidate_market.lower()
