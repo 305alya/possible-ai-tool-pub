@@ -763,6 +763,67 @@ elif run:
                 anchor_row.to_frame().T,
                 slip_df.head(slip_size - 1)
             ])
+            seen_totals = set()
+            filtered_rows = []
+            
+            for _, row in auto_slip.iterrows():
+                selection = str(row["selection"]).lower()
+            
+                if "total" in selection:
+                    if "over" in selection:
+                        total_side = "over"
+                    elif "under" in selection:
+                        total_side = "under"
+                    else:
+                        total_side = "other"
+            
+                    if total_side in seen_totals:
+                        continue
+            
+                    seen_totals.add(total_side)
+            
+                filtered_rows.append(row)
+            
+            auto_slip = pd.DataFrame(filtered_rows)
+            CORRELATION_RANK = {
+                "Anchor": 4,
+                "Strong": 3,
+                "Medium": 2,
+                "Weak": 1,
+                "Review": 0,
+                "": -1
+            }
+            
+            auto_slip["correlation_rank"] = auto_slip["correlation_score"].map(CORRELATION_RANK)
+            if len(auto_slip) < slip_size:
+                st.info(f"Removed duplicate totals. Showing {len(auto_slip)} unique legs instead of {slip_size}.")
+            # Remove near-duplicate totals
+            seen_totals = set()
+            filtered_rows = []
+            
+            for _, row in auto_slip.iterrows():
+                market = str(row["market"]).lower()
+                selection = str(row["selection"])
+            
+                if "total" in selection.lower():
+            
+                    # Extract Over/Under
+                    if "over" in selection.lower():
+                        total_side = "over"
+                    elif "under" in selection.lower():
+                        total_side = "under"
+                    else:
+                        total_side = "other"
+            
+                    # Only allow one Over and one Under total
+                    if total_side in seen_totals:
+                        continue
+            
+                    seen_totals.add(total_side)
+            
+                filtered_rows.append(row)
+            
+            auto_slip = pd.DataFrame(filtered_rows)
             # Safety check: same-game only
             if auto_slip["event_name"].nunique() > 1:
                 st.error("This slip includes legs from multiple games. Do not use it as a correlated same-game slip.")
