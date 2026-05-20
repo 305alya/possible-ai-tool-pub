@@ -432,7 +432,7 @@ with st.sidebar:
     "Triple Double": "player_triple_double",
 }
 
-markets = st.multiselect(
+    markets = st.multiselect(
     "Markets",
     list(MARKET_KEY_MAP.keys()),
     default=["ML"]
