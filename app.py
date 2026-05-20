@@ -668,15 +668,7 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
-        
 
-    def correlation_strength(anchor_market, candidate_market):
-            a = anchor_market.lower()
-            c = candidate_market.lower()
-
-            if "player" in a and "totals" in c:
-                return "Strong"
-                return "Weak"
                 
         with tabs[3]:
             st.caption("Uses Odds-API.io's /value-bets endpoint when your plan/bookmaker supports it.")
