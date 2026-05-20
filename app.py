@@ -491,7 +491,13 @@ with st.sidebar:
     kelly_mult = st.select_slider("Kelly multiplier", options=[0.1, 0.25, 0.5, 1.0], value=0.25)
     save_history = st.toggle("Save odds snapshots", value=True)
 
-run = st.button("Run Odds-API.io Scan", type="primary") or live
+if "has_run_scan" not in st.session_state:
+    st.session_state.has_run_scan = False
+
+if st.button("Run Odds-API.io Scan", type="primary"):
+    st.session_state.has_run_scan = True
+
+run = st.session_state.has_run_scan or live
 
 if not api_key:
     st.info("Paste your Odds-API.io key or add ODDS_API_IO_KEY in Streamlit Secrets.")
