@@ -872,6 +872,27 @@ elif run:
                 filtered_rows.append(row)
             
             auto_slip = pd.DataFrame(filtered_rows)
+            # Remove conflicting moneylines
+            ml_teams = set()
+            final_rows = []
+            
+            for _, row in auto_slip.iterrows():
+                market = str(row["market"]).lower()
+                selection = str(row["selection"])
+            
+                if "ml" in market:
+                    if selection in ml_teams:
+                        continue
+            
+                    # If another ML already exists, skip opposite side
+                    if len(ml_teams) >= 1:
+                        continue
+            
+                    ml_teams.add(selection)
+            
+                final_rows.append(row)
+            
+            auto_slip = pd.DataFrame(final_rows)
             # Safety check: same-game only
             if auto_slip["event_name"].nunique() > 1:
                 st.error("This slip includes legs from multiple games. Do not use it as a correlated same-game slip.")
