@@ -576,46 +576,29 @@ elif run:
                     "text/csv"
                 )
         with tabs[2]:
-            st.subheader("Correlation Builder")
+    st.subheader("Correlation Builder")
 
-    if df.empty:
-        st.info("Run a scan first.")
-    else:
-        event_choice = st.selectbox(
-            "Choose game",
-            sorted(df["event_name"].dropna().unique())
-        )
-        game_df = df[df["event_name"] == event_choice].copy()
+    event_choice = st.selectbox(
+        "Choose game",
+        sorted(df["event_name"].dropna().unique())
+    )
 
-        anchor_choice = st.selectbox(
-            "Choose your first leg",
-            game_df["selection"].astype(str)
-        )
+    game_df = df[df["event_name"] == event_choice].copy()
 
-        anchor_market = anchor_choice.lower()
-        game_df["correlation_reason"] = game_df["market"].apply(
-            lambda m: simple_correlation_reason(anchor_market, str(m))
-        )
+    anchor_choice = st.selectbox(
+        "Choose your first leg",
+        game_df["selection"].astype(str)
+    )
 
-        suggestions = game_df[game_df["correlation_reason"] != ""].copy()
+    st.write("Selected leg:", anchor_choice)
 
-        st.dataframe(
-            suggestions[
-                [
-                    "event_name",
-                    "market",
-                    "selection",
-                    "point",
-                    "american_odds",
-                    "ev_percent",
-                    "confidence_score",
-                    "correlation_reason"
-                ]
-            ],
-            use_container_width=True,
-            hide_index=True
-        )
-
+    st.dataframe(
+        game_df[
+            ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score"]
+        ],
+        use_container_width=True,
+        hide_index=True
+    )
         def simple_correlation_reason(anchor_market, candidate_market):
             a = anchor_market.lower()
             c = candidate_market.lower()
