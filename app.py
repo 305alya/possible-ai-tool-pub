@@ -576,29 +576,29 @@ elif run:
                     "text/csv"
                 )
         with tabs[2]:
-    st.subheader("Correlation Builder")
-
-    event_choice = st.selectbox(
-        "Choose game",
-        sorted(df["event_name"].dropna().unique())
-    )
-
-    game_df = df[df["event_name"] == event_choice].copy()
-
-    anchor_choice = st.selectbox(
-        "Choose your first leg",
-        game_df["selection"].astype(str)
-    )
-
-    st.write("Selected leg:", anchor_choice)
-
-    st.dataframe(
-        game_df[
-            ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score"]
-        ],
-        use_container_width=True,
-        hide_index=True
-    )
+                st.subheader("Correlation Builder")
+            
+                event_choice = st.selectbox(
+                    "Choose game",
+                    sorted(df["event_name"].dropna().unique())
+                )
+            
+                game_df = df[df["event_name"] == event_choice].copy()
+            
+                anchor_choice = st.selectbox(
+                    "Choose your first leg",
+                    game_df["selection"].astype(str)
+                )
+            
+                st.write("Selected leg:", anchor_choice)
+            
+                st.dataframe(
+                    game_df[
+                        ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score"]
+                    ],
+                    use_container_width=True,
+                    hide_index=True
+                )
         def simple_correlation_reason(anchor_market, candidate_market):
             a = anchor_market.lower()
             c = candidate_market.lower()
