@@ -679,7 +679,10 @@ elif run:
                 anchor_row.to_frame().T,
                 slip_df.head(slip_size - 1)
             ])
-
+            if auto_slip["ev_percent"].mean() < 0:
+                st.warning("This slip is correlated, but the average EV is negative. Use it as research, not a strong value play.")
+            else:
+                st.success("This slip is correlated and has positive average EV.")
             st.dataframe(
                 auto_slip[
                     ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_label", "correlation_score"]
