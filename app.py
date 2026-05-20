@@ -628,7 +628,7 @@ elif run:
 
             st.dataframe(
                 game_df[
-                    ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score"]
+                    ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_label"]
                 ],
                 use_container_width=True,
                 hide_index=True
@@ -682,7 +682,7 @@ elif run:
 
             st.dataframe(
                 auto_slip[
-                    ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_score", "correlation_score"]
+                    ["event_name", "market", "selection", "point", "american_odds", "ev_percent", "confidence_label", "correlation_score"]
                 ],
                 use_container_width=True,
                 hide_index=True
