@@ -855,13 +855,12 @@ elif run:
             if build_mode == "Strict":
 
                 # Remove duplicate totals
-                
-            seen_totals = set()
-            filtered_rows = []
+                seen_totals = set()
+                filtered_rows = []
             
-            for _, row in auto_slip.iterrows():
-                market = str(row["market"]).lower()
-                selection = str(row["selection"])
+                for _, row in auto_slip.iterrows():
+                    market = str(row["market"]).lower()
+                    selection = str(row["selection"])
             
                 if "total" in selection.lower():
             
